@@ -1,5 +1,6 @@
 import streamlit as st
 import vanna as vn
+from vanna.remote import VannaDefault  
 from train_model import Model
 
 @st.cache_resource(ttl=3600)
@@ -11,15 +12,11 @@ def setup_connexion():
         key =  st.secrets["vanna"]["key"]
         st.session_state.model_name = st.secrets["vanna"]["model_name"]
         print(key,st.session_state.model_name )
-
-        # model object
-        model = Model(st.session_state.model_name) 
-        api_key = vn.get_api_key(key)
-        vn.set_api_key(api_key)
-
-        # model
-        vn.set_model(st.session_state.model_name )
+        
+        vn = VannaDefault(model=st.session_state.model_name, api_key=key)
+       
         if st.session_state.model_status == False:
+            model = Model(st.session_state.model_name)
             model.train()
             st.session_state.model_status = True
     else:
